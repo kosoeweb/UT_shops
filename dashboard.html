@@ -234,7 +234,7 @@
         badge.innerText = shop.status || 'Active';
         badge.className = shop.status === 'Inactive' ? 'status-inactive' : 'status-active';
 
-        document.getElementById('pMapLink').href = `http://googleusercontent.com/maps.google.com/maps?q=${shop.latitude},${shop.longitude}`;
+        document.getElementById('pMapLink').href = `https://www.google.com/maps?q=${shop.latitude},${shop.longitude}`;
         new bootstrap.Modal(document.getElementById('profileModal')).show();
     }
 
