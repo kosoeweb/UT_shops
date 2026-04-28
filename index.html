@@ -36,8 +36,9 @@
           <option value="">-- Select Name --</option>
           <option value="Soe Moe Aung">Soe Moe Aung</option>
           <option value="Myo Win">Myo Win</option>
-          <option value="Kyaw Thu Win">Kyaw Thu Win</option>
+          <option value="Kyaw Thu Win">Kyaw Thu Win</option>          
           <option value="Tun Lin Aung">Tun Lin Aung</option>
+          <option value="Kyaw Zin Tun">Tun Lin Aung</option>
         </select>
       </div>
 
@@ -59,15 +60,17 @@
           <label class="form-label small fw-bold">Type</label>
           <select id="shopType" class="form-select">
             <option value="Battery">Battery</option>
-            <option value="Tyre">Tyre</option>
-            <option value="Lube">Lube</option>
+            <option value="Car Workshop">Car Workshop</option>
+            <option value="Building Material">Building Material</option>
           </select>
         </div>
         <div class="col-md-4 mb-3">
           <label class="form-label small fw-bold">Connection</label>
           <select id="shopConn" class="form-select">
             <option value="Old">Old</option>
-            <option value="New">New</option>
+            <option value="Current">Current</option>
+            <option value="Engaged">Engaged</option>
+            <option value="New">New</option> 
           </select>
         </div>
       </div>
@@ -75,6 +78,13 @@
       <div class="mb-4">
         <label class="form-label small fw-bold">Shop Photo (Camera or Gallery)</label>
         <input type="file" id="shopPhoto" class="form-control" accept="image/*">
+      </div>
+
+      <div class="mb-4">
+        <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" id="shopStatus" checked>
+        <label class="form-check-label fw-bold small text-success" for="shopStatus">Active Status</label>
+        </div>
       </div>
 
       <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="submitShop()">
@@ -99,6 +109,7 @@
         const type = document.getElementById('shopType').value;
         const conn = document.getElementById('shopConn').value;
         const fileInput = document.getElementById('shopPhoto').files[0];
+        const status = document.getElementById('shopStatus').checked ? 'Active' : 'Inactive';
 
         // 🌟 Collector Name မရွေးဘဲ တင်လို့မရအောင် တားထားသည်
         if (!collector || !name || !fileInput) {
@@ -134,6 +145,7 @@
                 photo_url: urlData.publicUrl,
                 latitude: pos.coords.latitude,
                 longitude: pos.coords.longitude
+                status: status
             }]);
 
             if (dbErr) throw dbErr;
