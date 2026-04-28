@@ -36,9 +36,9 @@
           <option value="">-- Select Name --</option>
           <option value="Soe Moe Aung">Soe Moe Aung</option>
           <option value="Myo Win">Myo Win</option>
-          <option value="Kyaw Thu Win">Kyaw Thu Win</option>          
+          <option value="Kyaw Thu Win">Kyaw Thu Win</option>
           <option value="Tun Lin Aung">Tun Lin Aung</option>
-          <option value="Kyaw Zin Tun">Tun Lin Aung</option>
+          <option value="Kyaw Zin Tun">Kyaw Zin Tun</option>
         </select>
       </div>
 
@@ -70,21 +70,14 @@
             <option value="Old">Old</option>
             <option value="Current">Current</option>
             <option value="Engaged">Engaged</option>
-            <option value="New">New</option> 
+            <option value="New">New</option>
           </select>
         </div>
       </div>
 
       <div class="mb-4">
-        <label class="form-label small fw-bold">Shop Photo (Camera or Gallery)</label>
+        <label class="form-label small fw-bold">Shop Photo</label>
         <input type="file" id="shopPhoto" class="form-control" accept="image/*">
-      </div>
-
-      <div class="mb-4">
-        <div class="form-check form-switch">
-        <input class="form-check-input" type="checkbox" id="shopStatus" checked>
-        <label class="form-check-label fw-bold small text-success" for="shopStatus">Active Status</label>
-        </div>
       </div>
 
       <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="submitShop()">
@@ -93,11 +86,9 @@
 
       <a href="dashboard.html" class="btn btn-outline-secondary w-100 mt-3 fw-bold">📊 Go to Dashboard</a>
     </div>
-      <p class="text-center text-muted mt-4" style="font-size: 0.75rem;">Developed by Universal Tractor Co., Ltd.</p>
   </div>
 
   <script>
-    // ⚠️ Project ID နဲ့ API Key ကို ပြန်ထည့်ပါ
     const supabaseUrl = 'https://zdifzvpjmmmsfitjsraw.supabase.co';
     const supabaseKey = 'sb_publishable_Eghy_AeArZhWU86ETOoWqg_FI8xXh9P';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -109,11 +100,9 @@
         const type = document.getElementById('shopType').value;
         const conn = document.getElementById('shopConn').value;
         const fileInput = document.getElementById('shopPhoto').files[0];
-        const status = document.getElementById('shopStatus').checked ? 'Active' : 'Inactive';
 
-        // 🌟 Collector Name မရွေးဘဲ တင်လို့မရအောင် တားထားသည်
         if (!collector || !name || !fileInput) {
-            return Swal.fire('Error', 'Collector Name, Shop Name, and Photo are required!', 'error');
+            return Swal.fire('Notice', 'Please fill all required fields.', 'warning');
         }
 
         Swal.fire({ title: 'Compressing & Saving...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -128,39 +117,24 @@
 
             const fileName = Date.now() + "_" + compressedFile.name.replace(/[^a-zA-Z0-9.\-_]/g, '');
             const { data: uploadData, error: uploadErr } = await supabaseClient.storage
-                .from('shop_images') 
-                .upload(fileName, compressedFile);
+                .from('shop_images').upload(fileName, compressedFile);
             
             if (uploadErr) throw uploadErr;
-            
             const { data: urlData } = supabaseClient.storage.from('shop_images').getPublicUrl(fileName);
 
-            // 🌟 Database ထဲသို့ collector_name ပါ ပေါင်းထည့်သည်
             const { error: dbErr } = await supabaseClient.from('shops_location').insert([{
                 collector_name: collector,
-                name: name, 
-                size: size, 
-                type: type, 
-                connection: conn,
+                name: name, size: size, type: type, connection: conn,
                 photo_url: urlData.publicUrl,
                 latitude: pos.coords.latitude,
-                longitude: pos.coords.longitude
-                status: status
+                longitude: pos.coords.longitude,
+                status: 'Active' // Default Active
             }]);
 
             if (dbErr) throw dbErr;
 
-            Swal.fire('Success', 'Shop registered successfully!', 'success').then(() => {
-                document.getElementById('shopName').value = '';
-                document.getElementById('shopPhoto').value = '';
-                // Dropdown ကို မူလအတိုင်း ပြန်ထားချင်ရင် အောက်ကစာကြောင်းကို အဖွင့်ပေးပါ
-                // document.getElementById('collectorName').value = '';
-            });
-
-        } catch (err) {
-            console.error("Error details:", err);
-            Swal.fire('Error', err.message || 'Something went wrong!', 'error');
-        }
+            Swal.fire('Success', 'Registration Complete!', 'success').then(() => location.reload());
+        } catch (err) { Swal.fire('Error', err.message, 'error'); }
     }
   </script>
 </body>
