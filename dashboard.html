@@ -4,75 +4,77 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UT - Dashboard</title>
-  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.1/dist/browser-image-compression.js"></script>
 
   <style>
-    /* 🌟 Green Theme Style */
     body { background-color: #f4f6f4; font-family: sans-serif; }
-    .header { background: #198754; color: white; padding: 15px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 15px; }
+    .header { background: #198754; color: white; padding: 15px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 15px; }
     .table-success th { background-color: #d1e7dd !important; color: #198754; }
+    .status-active { background-color: #d1e7dd; color: #0f5132; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+    .status-inactive { background-color: #f8d7da; color: #842029; padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
     .profile-img { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; border: 3px solid #198754; }
-    .status-active { background-color: #d1e7dd; color: #0f5132; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
-    .status-inactive { background-color: #f8d7da; color: #842029; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
   </style>
 </head>
 <body onload="initMap()">
 
   <div class="header mb-4">
-    <img src="https://zdifzvpjmmmsfitjsraw.supabase.co/storage/v1/object/public/Logo/UT%20Logo.png" alt="Logo" style="height: 45px; width: auto; object-fit: contain; flex-shrink: 0;">
+    <img src="https://zdifzvpjmmmsfitjsraw.supabase.co/storage/v1/object/public/Logo/UT%20Logo.png" style="height: 45px; width: auto; object-fit: contain;">
     <div class="text-start">
       <h4 class="m-0 fw-bold">Universal Tractor Co., Ltd.</h4>
-      <small style="opacity: 0.9;">Shops Location Dashboard</small>
+      <small>Shops Location Dashboard</small>
     </div>
   </div>
 
   <div class="container px-3">
     <div class="row g-2 mb-4 p-3 bg-white rounded shadow-sm align-items-end border-top border-success border-3">
-      <div class="col-md-2">
-        <label class="form-label small fw-bold text-success">Shop Name</label>
-        <select id="fName" class="form-select" onchange="loadDashboard()"><option value="">All Shops</option></select>
+      <div class="col-md-3">
+        <label class="form-label small fw-bold text-success">Shop Name (Type or Select)</label>
+        <input list="shopNameList" id="fName" class="form-control" onchange="loadDashboard()" placeholder="Search Shop...">
+        <datalist id="shopNameList"></datalist>
       </div>
       <div class="col-md-2">
-        <label class="form-label small fw-bold text-success">Status</label>
-        <select id="fStatus" class="form-select" onchange="loadDashboard()">
-          <option value="">All Status</option><option value="Active">Active</option><option value="Inactive">Inactive</option>
+        <label class="form-label small fw-bold text-success">Size</label>
+        <select id="fSize" class="form-select" onchange="loadDashboard()">
+          <option value="">All Sizes</option><option value="Small">Small</option><option value="Medium">Medium</option><option value="Large">Large</option>
         </select>
       </div>
       <div class="col-md-2">
         <label class="form-label small fw-bold text-success">Type</label>
         <select id="fType" class="form-select" onchange="loadDashboard()">
-          <option value="">All Types</option><option value="Battery">Battery</option><option value="Tyre">Tyre</option><option value="Lube">Lube</option>
+          <option value="">All Types</option>
+          <option value="Battery">Battery</option>
+          <option value="Car Workshop">Car Workshop</option>
+          <option value="Building Material">Building Material</option>
         </select>
       </div>
       <div class="col-md-2">
         <label class="form-label small fw-bold text-success">Connection</label>
         <select id="fConn" class="form-select" onchange="loadDashboard()">
-          <option value="">All Conn</option><option value="Old">Old</option><option value="New">New</option>
+          <option value="">All Conn</option>
+          <option value="Old">Old</option><option value="Current">Current</option>
+          <option value="Engaged">Engaged</option><option value="New">New</option>
         </select>
       </div>
-      <div class="col-md-4 text-end">
-        <a href="index.html" class="btn btn-success fw-bold w-100">➕ Add New Shop</a>
+      <div class="col-md-3">
+        <a href="index.html" class="btn btn-success fw-bold w-100">➕ New Registration</a>
       </div>
     </div>
 
     <div class="bg-white p-2 rounded shadow-sm mb-4 border border-light">
-      <div id="map" style="height: 450px; width: 100%; border-radius: 8px; z-index: 1;"></div>
+      <div id="map" style="height: 450px; width: 100%; border-radius: 8px;"></div>
     </div>
 
     <div class="table-responsive bg-white rounded shadow-sm p-3 mb-5">
       <table class="table table-hover align-middle">
         <thead class="table-success">
           <tr>
-            <th>Photo</th><th>Shop Name</th><th>Status</th><th>Size</th><th>Type</th><th>Action</th>
+            <th>Photo</th><th>Shop Name</th><th>Size</th><th>Type</th><th>Conn</th><th>Action</th>
           </tr>
         </thead>
         <tbody id="shopTableBody"></tbody>
@@ -88,18 +90,18 @@
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body text-center">
-          <img id="pPhoto" src="" class="profile-img mb-3" alt="Shop Photo">
+          <img id="pPhoto" src="" class="profile-img mb-3">
           <h4 id="pTitle" class="fw-bold text-success mb-2"></h4>
           <div class="row text-start g-2 px-3">
-            <div class="col-6"><p class="mb-1"><strong>📏 Size:</strong> <span id="pSize"></span></p></div>
-            <div class="col-6"><p class="mb-1"><strong>🏷️ Type:</strong> <span id="pType"></span></p></div>
-            <div class="col-6"><p class="mb-1"><strong>🔗 Conn:</strong> <span id="pConn"></span></p></div>
-            <div class="col-6"><p class="mb-1"><strong>📍 Geo:</strong> <span id="pGeo" style="font-size:0.75rem;"></span></p></div>
+            <div class="col-6"><strong>📏 Size:</strong> <span id="pSize"></span></div>
+            <div class="col-6"><strong>🏷️ Type:</strong> <span id="pType"></span></div>
+            <div class="col-6"><strong>🔗 Conn:</strong> <span id="pConn"></span></div>
+            <div class="col-6"><strong>📍 Status:</strong> <span id="pStatusBadge"></span></div>
           </div>
           <div class="mt-2 pt-2 border-top text-start px-3">
-            <p class="mb-1 text-muted small"><strong>📝 Data Collected By:</strong> <span id="pCollector" class="text-dark fw-bold"></span></p>
+            <small class="text-muted">Collector: <b id="pCollector" class="text-dark"></b></small>
           </div>
-          <a id="pMapLink" href="#" target="_blank" class="btn btn-success w-100 mt-4 fw-bold">🧭 Open Google Maps</a>
+          <a id="pMapLink" href="#" target="_blank" class="btn btn-success w-100 mt-4 fw-bold">🧭 Open Maps</a>
         </div>
       </div>
     </div>
@@ -108,61 +110,40 @@
   <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title fw-bold">✏️ Edit Shop Details</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
+        <div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold">Edit Details</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
         <div class="modal-body text-start">
-          
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Data Collector</label>
+          <div class="mb-3"><label class="form-label fw-bold small">Shop Name</label><input type="text" id="editName" class="form-control border-success"></div>
+          <div class="mb-3"><label class="form-label fw-bold small">Data Collector</label>
             <select id="editCollector" class="form-select border-success">
-              <option value="Aung Aung">Aung Aung</option><option value="Maung Maung">Maung Maung</option>
-              <option value="Kyaw Kyaw">Kyaw Kyaw</option><option value="Su Su">Su Su</option>
+              <option value="Soe Moe Aung">Soe Moe Aung</option><option value="Myo Win">Myo Win</option>
+              <option value="Kyaw Thu Win">Kyaw Thu Win</option><option value="Tun Lin Aung">Tun Lin Aung</option><option value="Kyaw Zin Tun">Kyaw Zin Tun</option>
             </select>
           </div>
-
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Shop Name</label>
-            <input type="text" id="editName" class="form-control border-success">
-          </div>
-
-          <div class="mb-3">
-            <div class="form-check form-switch p-0 ps-5">
-              <input class="form-check-input" type="checkbox" id="editStatus">
-              <label class="form-check-label fw-bold text-success" for="editStatus">Active Status</label>
+          <div class="row mb-3">
+            <div class="col-6"><label class="form-label small fw-bold">Size</label><select id="editSize" class="form-select"><option value="Small">Small</option><option value="Medium">Medium</option><option value="Large">Large</option></select></div>
+            <div class="col-6"><label class="form-label small fw-bold">Type</label>
+                <select id="editType" class="form-select">
+                    <option value="Battery">Battery</option><option value="Car Workshop">Car Workshop</option><option value="Building Material">Building Material</option>
+                </select>
             </div>
           </div>
-
-          <div class="row">
-            <div class="col-md-4 mb-3">
-              <label class="form-label small fw-bold">Size</label>
-              <select id="editSize" class="form-select"><option value="Small">Small</option><option value="Medium">Medium</option><option value="Large">Large</option></select>
+          <div class="row mb-3">
+            <div class="col-6"><label class="form-label small fw-bold">Connection</label>
+                <select id="editConn" class="form-select">
+                    <option value="Old">Old</option><option value="Current">Current</option><option value="Engaged">Engaged</option><option value="New">New</option>
+                </select>
             </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label small fw-bold">Type</label>
-              <select id="editType" class="form-select"><option value="Battery">Battery</option><option value="Tyre">Tyre</option><option value="Lube">Lube</option></select>
-            </div>
-            <div class="col-md-4 mb-3">
-              <label class="form-label small fw-bold">Conn</label>
-              <select id="editConn" class="form-select"><option value="Old">Old</option><option value="New">New</option></select>
-            </div>
+            <div class="col-6 pt-4"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="editStatus"><label class="form-check-label fw-bold small">Active</label></div></div>
           </div>
-
-          <div class="mb-4">
-            <label class="form-label small fw-bold">Change Photo <span class="text-muted">(Optional)</span></label>
-            <input type="file" id="editPhoto" class="form-control" accept="image/*">
-          </div>
-
-          <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="saveEdit()">💾 Update Data</button>
+          <div class="mb-3"><label class="form-label small fw-bold">Change Photo</label><input type="file" id="editPhoto" class="form-control" accept="image/*"></div>
+          <button class="btn btn-success btn-lg w-100 fw-bold" onclick="saveEdit()">💾 Update Data</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ⚠️ Supabase Credentials
-    const supabaseUrl = 'https://zdifzvpjmmmsfitjsraw.supabase.co';
+     const supabaseUrl = 'https://zdifzvpjmmmsfitjsraw.supabase.co';
     const supabaseKey = 'sb_publishable_Eghy_AeArZhWU86ETOoWqg_FI8xXh9P';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
@@ -174,115 +155,104 @@
         loadDashboard();
     }
 
+    async function populateShopNames(data) {
+        let options = '';
+        const uniqueNames = [...new Set(data.map(i => i.name))];
+        uniqueNames.forEach(n => options += `<option value="${n}">`);
+        document.getElementById('shopNameList').innerHTML = options;
+    }
+
     async function loadDashboard() {
         let query = supabaseClient.from('shops_location').select('*');
-        
         const nF = document.getElementById('fName').value;
-        const sF = document.getElementById('fStatus').value;
+        const sF = document.getElementById('fSize').value;
         const tF = document.getElementById('fType').value;
         const cF = document.getElementById('fConn').value;
 
-        if (nF) query = query.eq('name', nF);
-        if (sF) query = query.eq('status', sF);
+        if (nF) query = query.ilike('name', `%${nF}%`);
+        if (sF) query = query.eq('size', sF);
         if (tF) query = query.eq('type', tF);
         if (cF) query = query.eq('connection', cF);
 
-        const { data, error } = await query;
-        if(error) return;
-        
+        const { data } = await query;
+        if(!data) return;
         allShopsData = data;
+        populateShopNames(data);
+
         let html = '';
         markers.forEach(m => map.removeLayer(m));
         markers = [];
 
         data.forEach((shop, index) => {
-            const statusBadge = shop.status === 'Inactive' ? 'status-inactive' : 'status-active';
             html += `<tr>
-              <td><img src="${shop.photo_url}" width="50" height="50" style="object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openProfile(${index})"></td>
+              <td><img src="${shop.photo_url}" width="45" height="45" style="object-fit:cover; border-radius:6px; cursor:pointer;" onclick="openProfile(${index})"></td>
               <td class="fw-bold">${shop.name}</td>
-              <td><span class="${statusBadge}">${shop.status || 'Active'}</span></td>
-              <td>${shop.size}</td><td>${shop.type}</td>
-              <td>
-                <button class="btn btn-sm btn-outline-success me-1" onclick="openProfile(${index})">👁️</button>
-                <button class="btn btn-sm btn-outline-primary" onclick="openEdit(${index})">✏️</button>
-              </td>
+              <td><span class="badge bg-light text-dark border">${shop.size}</span></td>
+              <td class="small">${shop.type}</td>
+              <td class="small">${shop.connection}</td>
+              <td><button class="btn btn-sm btn-outline-success" onclick="openProfile(${index})">👁️</button> <button class="btn btn-sm btn-outline-primary" onclick="openEdit(${index})">✏️</button></td>
             </tr>`;
             
-            if(shop.latitude && shop.longitude) {
-                const marker = L.marker([shop.latitude, shop.longitude]).bindPopup(`<b>${shop.name}</b>`).addTo(map);
-                markers.push(marker);
-            }
+            // 🌟 Pin click to Profile modal
+            const marker = L.marker([shop.latitude, shop.longitude]).addTo(map);
+            marker.on('click', () => openProfile(index));
+            markers.push(marker);
         });
         document.getElementById('shopTableBody').innerHTML = html;
         if(markers.length > 0) map.fitBounds(new L.featureGroup(markers).getBounds(), {padding:[50,50]});
-        setTimeout(()=>map.invalidateSize(), 400);
     }
 
-    // 👁️ View Profile (Fixed Typo)
     function openProfile(index) {
         const shop = allShopsData[index];
         document.getElementById('pTitle').innerText = shop.name;
         document.getElementById('pPhoto').src = shop.photo_url;
         document.getElementById('pSize').innerText = shop.size;
         document.getElementById('pType').innerText = shop.type;
-        document.getElementById('pConn').innerText = shop.connection || "-";
-        document.getElementById('pGeo').innerText = parseFloat(shop.latitude).toFixed(4) + ", " + parseFloat(shop.longitude).toFixed(4);
-        document.getElementById('pCollector').innerText = shop.collector_name || "-";
+        document.getElementById('pConn').innerText = shop.connection;
+        document.getElementById('pCollector').innerText = shop.collector_name || "N/A";
         
-        // Fixed Template Literal Typo here
+        const badge = document.getElementById('pStatusBadge');
+        badge.innerText = shop.status || 'Active';
+        badge.className = shop.status === 'Inactive' ? 'status-inactive' : 'status-active';
+
         document.getElementById('pMapLink').href = `https://www.google.com/maps?q=${shop.latitude},${shop.longitude}`;
-        
         new bootstrap.Modal(document.getElementById('profileModal')).show();
     }
 
-    // ✏️ Open Edit Modal
     function openEdit(index) {
         const shop = allShopsData[index];
-        currentEditId = shop.id;
-        currentEditPhotoUrl = shop.photo_url;
-
-        document.getElementById('editCollector').value = shop.collector_name || "";
+        currentEditId = shop.id; currentEditPhotoUrl = shop.photo_url;
         document.getElementById('editName').value = shop.name;
-        document.getElementById('editStatus').checked = (shop.status !== 'Inactive');
+        document.getElementById('editCollector').value = shop.collector_name || "";
         document.getElementById('editSize').value = shop.size;
         document.getElementById('editType').value = shop.type;
-        document.getElementById('editConn').value = shop.connection || "Old";
-        document.getElementById('editPhoto').value = "";
-
+        document.getElementById('editConn').value = shop.connection;
+        document.getElementById('editStatus').checked = (shop.status !== 'Inactive');
         new bootstrap.Modal(document.getElementById('editModal')).show();
     }
 
-    // 💾 Save Edit Data
     async function saveEdit() {
         const name = document.getElementById('editName').value;
         const collector = document.getElementById('editCollector').value;
         const status = document.getElementById('editStatus').checked ? 'Active' : 'Inactive';
-        const size = document.getElementById('editSize').value;
-        const type = document.getElementById('editType').value;
-        const conn = document.getElementById('editConn').value;
         const file = document.getElementById('editPhoto').files[0];
-
-        if(!name) return Swal.fire('Error', 'Shop name required', 'error');
         Swal.fire({ title: 'Updating...', didOpen: () => Swal.showLoading() });
-
         try {
             let photoUrl = currentEditPhotoUrl;
             if(file) {
-                const compressed = await imageCompression(file, { maxSizeMB: 0.5 });
-                const fName = Date.now() + "_" + file.name;
-                await supabaseClient.storage.from('shop_images').upload(fName, compressed);
-                photoUrl = supabaseClient.storage.from('shop_images').getPublicUrl(fName).data.publicUrl;
+                const comp = await imageCompression(file, { maxSizeMB: 0.5 });
+                const fn = Date.now() + "_" + file.name;
+                await supabaseClient.storage.from('shop_images').upload(fn, comp);
+                photoUrl = supabaseClient.storage.from('shop_images').getPublicUrl(fn).data.publicUrl;
             }
-
-            const { error } = await supabaseClient.from('shops_location').update({
-                name, collector_name: collector, status, size, type, connection: conn, photo_url: photoUrl
+            await supabaseClient.from('shops_location').update({
+                name, collector_name: collector, status, 
+                size: document.getElementById('editSize').value, 
+                type: document.getElementById('editType').value, 
+                connection: document.getElementById('editConn').value,
+                photo_url: photoUrl
             }).eq('id', currentEditId);
-
-            if(error) throw error;
-            Swal.fire('Success!', 'Data updated', 'success').then(() => {
-                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-                loadDashboard();
-            });
+            Swal.fire('Updated!', '', 'success').then(() => location.reload());
         } catch (e) { Swal.fire('Error', e.message, 'error'); }
     }
   </script>
