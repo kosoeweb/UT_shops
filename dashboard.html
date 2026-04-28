@@ -23,8 +23,11 @@
 <body onload="initMap()">
 
   <div class="header mb-4">
-    <img src="https://cdn-icons-png.flaticon.com/512/3061/3061341.png" alt="Logo" style="height: 45px; width: auto; object-fit: contain;">
-    <div class="text-start"><h4 class="m-0 fw-bold">Universal Tractor Co., Ltd.</h4><small>Shop Dashboard</small></div>
+    <img src="https://zdifzvpjmmmsfitjsraw.supabase.co/storage/v1/object/public/Logo/UT%20Logo.png" alt="Logo" style="height: 45px; width: auto; object-fit: contain; flex-shrink: 0;">
+    <div class="text-start">
+      <h4 class="m-0 fw-bold">Universal Tractor Co., Ltd.</h4>
+      <small style="opacity: 0.9;">Shops Location Dashboard</small>
+    </div>
   </div>
 
   <div class="container px-3">
@@ -32,6 +35,15 @@
       <div class="col-md-2">
         <label class="form-label small fw-bold text-success">Shop Name</label>
         <select id="fName" class="form-select" onchange="loadDashboard()"><option value="">All Shops</option></select>
+      </div>
+       <div class="col-md-2">
+        <label class="form-label small fw-bold text-success">Size</label>
+        <select id="fSize" class="form-select" onchange="loadDashboard()">
+          <option value="">All Sizes</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+        </select>
       </div>
       <div class="col-md-2">
         <label class="form-label small fw-bold text-success">Status</label>
@@ -44,11 +56,21 @@
       <div class="col-md-2">
         <label class="form-label small fw-bold text-success">Type</label>
         <select id="fType" class="form-select" onchange="loadDashboard()">
-          <option value="">All Types</option><option value="Battery">Battery</option><option value="Tyre">Tyre</option>
+          <option value="">All Types</option><option value="Battery">Battery</option><option value="Car Workshop">Car Workshop</option><option value="Building Material">Building Material</option>
         </select>
       </div>
-      <div class="col-md-6 text-end">
-        <a href="index.html" class="btn btn-success fw-bold">➕ Add Shop</a>
+      <div class="col-md-2">
+        <label class="form-label small fw-bold text-success">Connection</label>
+        <select id="fConn" class="form-select" onchange="loadDashboard()">
+          <option value="">All</option>
+          <option value="Old">Old</option>
+            <option value="Current">Current</option>
+	    <option value="Engaged">Engaged</option>
+            <option value="New">New</option>
+        </select>
+      </div>
+      <div class="col-md-4 text-end">
+        <a href="index.html" class="btn btn-outline-success fw-bold w-100">➕ Add New Shop</a>
       </div>
     </div>
 
@@ -99,8 +121,8 @@
   </div>
 
   <script>
-    const supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
-    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabaseUrl = 'https://zdifzvpjmmmsfitjsraw.supabase.co';
+    const supabaseKey = 'sb_publishable_Eghy_AeArZhWU86ETOoWqg_FI8xXh9P';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let map, markers = [], allShopsData = [], currentEditId = null, currentEditPhotoUrl = "";
