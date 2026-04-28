@@ -220,7 +220,7 @@
         document.getElementById('pType').innerText = shop.type;
         document.getElementById('pConn').innerText = shop.connection;
         document.getElementById('pGeo').innerText = parseFloat(shop.latitude).toFixed(4) + ", " + parseFloat(shop.longitude).toFixed(4);
-        
+        document.getElementById('pCollector').innerText = shop.collector_name || "-";
         document.getElementById('pMapLink').href = `https://www.google.com/maps?q=${shop.latitude},${shop.longitude}`;
         
         const modal = new bootstrap.Modal(document.getElementById('profileModal'));
