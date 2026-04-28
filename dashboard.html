@@ -69,8 +69,8 @@
             <option value="New">New</option>
         </select>
       </div>
-      <div class="col-md-4 text-end">
-        <a href="index.html" class="btn btn-outline-success fw-bold w-100">➕ Add New Shop</a>
+      <div class="col-md-6 text-end">
+        <a href="index.html" class="btn btn-success fw-bold">➕ Add New Shop</a>
       </div>
     </div>
 
@@ -85,6 +85,31 @@
         </thead>
         <tbody id="shopTableBody"></tbody>
       </table>
+    </div>
+  </div>
+
+  <div class="modal fade" id="profileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold" id="pName">Shop Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="pPhoto" src="" class="profile-img mb-3" alt="Shop Photo">
+          <h4 id="pTitle" class="fw-bold text-success mb-3"></h4>
+          
+          <div class="row text-start g-2 px-3">
+            <div class="col-6"><p class="mb-1"><strong>📏 Size:</strong> <span id="pSize"></span></p></div>
+            <div class="col-6"><p class="mb-1"><strong>🏷️ Type:</strong> <span id="pType"></span></p></div>
+            <div class="col-6"><p class="mb-1"><strong>🔗 Conn:</strong> <span id="pConn"></span></p></div>
+            <div class="col-6"><p class="mb-1"><strong>📍 Lat/Lng:</strong> <span id="pGeo" style="font-size:0.8rem;"></span></p></div>
+			<div class="col-12 mt-2 pt-2 border-top">    <p class="mb-1 text-muted small"><strong>📝 Data Collected By:</strong> <span id="pCollector" class="text-dark fw-bold"></span></p></div>
+          </div>
+          
+          <a id="pMapLink" href="#" target="_blank" class="btn btn-primary w-100 mt-4 fw-bold">🧭 Get Location</a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -110,7 +135,7 @@
             </div>
             <div class="col-6 mb-3">
                 <label class="form-label small fw-bold">Type</label>
-                <select id="editType" class="form-select"><option value="Battery">Battery</option><option value="Tyre">Tyre</option></select>
+                <select id="editType" class="form-select"><option value="Battery">Battery</option><option value="Car Workshop">Car Workshop</option><option value="Building Material">Building Material</option></select>
             </div>
           </div>
           <div class="mb-3"><label class="form-label small fw-bold">Update Photo</label><input type="file" id="editPhoto" class="form-control"></div>
@@ -165,6 +190,21 @@
         document.getElementById('shopTableBody').innerHTML = html;
     }
 
+	function openProfile(index) {
+        const shop = allShopsData[index];
+        document.getElementById('pTitle').innerText = shop.name;
+        document.getElementById('pPhoto').src = shop.photo_url;
+        document.getElementById('pSize').innerText = shop.size;
+        document.getElementById('pType').innerText = shop.type;
+        document.getElementById('pConn').innerText = shop.connection;
+        document.getElementById('pGeo').innerText = parseFloat(shop.latitude).toFixed(4) + ", " + parseFloat(shop.longitude).toFixed(4);
+        document.getElementById('pCollector').innerText = shop.collector_name || "-";
+        document.getElementById('pMapLink').href = `https://www.google.com/maps?q=${shop.latitude},${shop.longitude}`;
+        
+        const modal = new bootstrap.Modal(document.getElementById('profileModal'));
+        modal.show();
+    }
+	  
     function openEdit(index) {
         const shop = allShopsData[index];
         currentEditId = shop.id;
